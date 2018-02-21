@@ -1,12 +1,13 @@
 // c-implementation gauss solver for hw_1 programm_languages
 
-
-#include "gauss.h"
 #include "stdio.h"
 #include "stdlib.h"
+#include "math.h"
 
 int parse_args (int argc, char *argv[]);
-void print (double *buf, int col, int row = 1);
+void print (double *buf, int col, int row);
+int init_matrix (double *matr, double *rhs, int size);
+int gauss_solver (double *matr, double *x, double *rhs, int size);
 
 int main (int argc, char *argv[])
 {
@@ -27,14 +28,13 @@ int main (int argc, char *argv[])
     rhs = matr + size * size;
     x = rhs + size;
 
-    init_matrix (matr, x, rhs, size);
-
-    print (matr, size, size);
-    print (rhs, size);
+    init_matrix (matr, rhs, size);
 
     gauss_solver (matr, x, rhs, size);
 
-    print (x, size);
+    printf ("Solve:\n");
+    print (x, size, 1);
+    printf (">>>>>>>>>>>>>>\n");
 
     if (workspace)
       free (workspace);
@@ -54,7 +54,7 @@ int parse_args (int argc, char *argv[])
     return read_size;
 }
 
-int print(double *buf, int col, int row)
+void print(double *buf, int col, int row)
 {
     int i = 0, j = 0;
     if (buf == NULL)
@@ -63,7 +63,59 @@ int print(double *buf, int col, int row)
     for (i = 0; i < row; i++)
     {
        for (j = 0; j < col; j++)
-           printf ("%.4lf", buf[j + col * i]);
+           printf ("%.4lf  ", buf[j + col * i]);
         printf ("\n");
     }
+    printf ("\n");
+}
+
+int init_matrix(double *matr, double *rhs, int size)
+{
+    int i = 0, j = 0;
+    double sum = 0.0;
+    for (i = 0; i < size; ++i)
+        for (j = 0; j < size; ++j)
+            matr[j + i * size] = abs (i - j) + 1;
+    for (i = 0; i < size; ++i)
+    {
+        for (j = 0; j < size; ++j)
+            sum += matr[j + i * size];
+        rhs[i] = sum;
+        sum = 0.0;
+    }
+}
+
+int gauss_solver(double *matr, double *x, double *rhs, int size)
+{
+    int i = 0, j = 0, k = 0;
+    double diag = 0.0;
+    double sum = 0.0;
+
+    for (i = 0; i < size; ++i)
+    {
+        diag = matr[i + i * size];
+        rhs [i] /= diag;
+        for (k = i + 1; k < size; ++k)
+            matr[k + i * size] /= diag;
+
+        for (j = i + 1; j < size; ++j)
+        {
+            for (k = i + 1; k < size; ++k)
+                matr[k + j * size] -= matr[k + i * size] * matr[i + j * size];
+
+            rhs[j] -= rhs[i] * matr[i + j * size];
+        }
+    }
+
+    for (i = size - 1; i >=0; --i)
+    {
+        for (j = size - 1; j > i; --j)
+        {
+            sum += matr[j + i * size] * x[j];
+        }
+        x[i] = rhs[i] - sum;
+        sum = 0.0;
+    }
+
+    return 0;
 }
