@@ -1,0 +1,34 @@
+With Ada.Text_IO; Use Ada.Text_IO;  
+With Ada.Integer_Text_IO; Use Ada.Integer_Text_IO;
+
+procedure Program is
+	type Float_Array_Type is array(Float range <>);
+	procedure Init_Matrix (Matr : Float_Array_Type, Rhs : Float_Array_Type, Size : Integer) is
+	  Sum : Float;
+	begin
+	  for I in 0..Size Loop
+	    for J in 0..Size Loop
+	      Matr(J + I * Size) = abs (I - J) + 1;
+	    end Loop
+	  end Loop
+	  
+	  for I in 0..Size Loop
+	    for J in 0..Size Loop
+	      Sum = Sum + Matr(J + I * Size);
+	    end Loop
+	    Rhs(I) = Sum;
+	    Sum = 0
+	  end Loop
+	end Init_Matrix
+	
+begin
+  
+  Get (Size);
+  if (Size < 0) then
+    exit;
+  declare 
+    Matr : Float_Array_Type (0..Size * Size);
+    X : Float_Array_Type (0..Size)
+    Rhs : Float_Array_Type (0..Size)
+  
+end Program;
