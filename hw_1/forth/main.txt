@@ -1,0 +1,8 @@
+: MALLOC HERE SWAP 2* ALLOT ;
+: [I] OVER + + ;
+
+: PRINT_ARRAY
+
+: INIT_MATRIX
+
+: MAIN 
