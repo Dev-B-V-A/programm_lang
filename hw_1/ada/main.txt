@@ -2,24 +2,62 @@ With Ada.Text_IO; Use Ada.Text_IO;
 With Ada.Integer_Text_IO; Use Ada.Integer_Text_IO;
 
 procedure Program is
-	type Float_Array_Type is array(Float range <>);
+	type Float_Array_Type is array(Integer range <>) of Float;
+	
+	procedure Print_Vector (Vector : in out Float_Array_Type, Rows : in Integer, Columns : in Integer)
+	begin 
+	  for I in 0..Rows Loop
+	    for J in 0..Columns Loop
+	      Put (Vector (J + I * Columns), fore => 5, aft => 3);
+	      Put (" ");
+	    end Loop;
+	    New_Line;
+	  end Loop;
+	  New_Line;
+	end Print_Vector;
+	
 	procedure Init_Matrix (Matr : Float_Array_Type, Rhs : Float_Array_Type, Size : Integer) is
 	  Sum : Float;
 	begin
 	  for I in 0..Size Loop
 	    for J in 0..Size Loop
 	      Matr(J + I * Size) = abs (I - J) + 1;
-	    end Loop
-	  end Loop
+	    end Loop;
+	  end Loop;
 	  
 	  for I in 0..Size Loop
 	    for J in 0..Size Loop
-	      Sum = Sum + Matr(J + I * Size);
-	    end Loop
+	      Sum := Sum + Matr(J + I * Size);
+	    end Loop;
 	    Rhs(I) = Sum;
 	    Sum = 0
-	  end Loop
-	end Init_Matrix
+	  end Loop;
+	end Init_Matrix;
+	
+	procedure Gauss_Solver (Matr : in Float_Array_Type, X : in out Float_Array_Type, Rhs : in Float_Array_Type, Size : in Integer) is
+	  Diag : Float, Sum : Float;
+	begin
+	  for I in 0..Size Loop
+	    Diag = Matr (I + I * Size);
+	    Rhs (I) /= Diag;
+	    for K in (I + 1)..Size Loop
+	      Matr (K + I * Size) /= Diag;
+	    end Loop;
+	    for J in (I + 1)..Size Loop
+	      for K in (I + 1)..Size Loop
+	        Matr (K + J * Size) -= Matr (K + I * Size) * Matr (I + J * Size);
+	      end Loop;
+	      Rhs (J) -= Rhs (i) * Matr (I + J * Size);
+	    end Loop;
+	  end Loop;
+	  for I in reverse 0..Size Loop
+	    for J in reverse (I + 1)..Size Loop
+	      Sum += Matr (J + I * Size) * X (J);
+	    end Loop;
+	    X(I) = Rhs (I) - Sum;
+	    Sum = 0;
+	  end Loop;
+	end Gauss_Solver;
 	
 begin
   
@@ -28,7 +66,13 @@ begin
     exit;
   declare 
     Matr : Float_Array_Type (0..Size * Size);
-    X : Float_Array_Type (0..Size)
-    Rhs : Float_Array_Type (0..Size)
+    X : Float_Array_Type (0..Size);
+    Rhs : Float_Array_Type (0..Size);
+  
+    Init_Matrix (Matr, Rhs, Size);
+    
+    Gauss_Solver (Matr, X, Rhs, Size);
+    
+    Print_Vector (X, Size);
   
 end Program;
