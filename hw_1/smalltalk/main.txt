@@ -1,0 +1,5 @@
+size := (stdin nextLine) asNumber.
+
+matr := Float new: size.
+x := Float new : size.
+rhs := Float new : size.
