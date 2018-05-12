@@ -1,5 +1,17 @@
 size := (stdin nextLine) asNumber.
 
-matr := Float new: size.
-x := Float new : size.
-rhs := Float new : size.
+(size < 1) ifTrue: [ 'Size matrix < 1, is invalid size!' displayNl. ]
+
+matrix := Array new: size.
+x := Array new: size.
+rhs := Array new: size.
+
+print_matrix := [
+  1 to: size do: [ :i |
+    1 to: size do: [ :j |
+      matrix at: (i * size + j) display.
+    ]
+    displayNl.
+  ]
+]
+  
