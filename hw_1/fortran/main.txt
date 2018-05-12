@@ -1,0 +1,89 @@
+program TEST
+    implicit none
+    
+    real, dimension(:), allocatable :: matrix
+    real, dimension(:), allocatable :: x
+    real, dimension(:), allocatable :: rhs
+    
+    integer :: n
+    integer :: ierror
+    do
+            read(*,'(i10)',iostat=ierror) n
+
+            if ( ierror == 0 ) then
+               exit
+            endif
+            write(*,*) 'An error occured - please try again'
+    enddo
+
+    allocate(matrix(1: n * n))
+    allocate(x(1: n))
+    allocate(rhs(1: n))
+    
+    call init_matrix ()
+    
+    call gauss_solver ()
+    
+    call print_vector ()
+
+    ! Free memory
+    deallocate(matrix)
+    deallocate(x)
+    deallocate(rhs)
+    
+contains
+
+subroutine print_vector ()
+     integer :: i
+     do i = 1, n
+       write (*, *) x(i)
+     end do
+end subroutine print_vector
+
+subroutine init_matrix ()
+    integer :: i, j
+    real :: sum 
+    do i = 1, n
+      do j = 1, n
+        matrix (j + i * n) = ABS (i - j) + 1.0
+      end do
+    end do
+    sum = 0.
+    do i = 1, n
+      do j = 1, n
+        sum = sum + matrix (j + i * n)
+      end do
+      rhs (i) = sum
+      sum = 0
+    end do
+end subroutine init_matrix
+
+subroutine gauss_solver ()
+    integer :: i, k, j
+    real :: sum, diag
+
+    do i = 1, n
+      diag = matrix (i + i * n)
+      rhs (i) = rhs (i) / diag
+      do k = 1, n
+        matrix (k + i * n) = matrix (k + i * n) / diag
+      end do
+    do j = i + 1, n
+      do k = i + 1, n
+        matrix (k + j * n) = matrix (k + j * n) - matrix (k + i * n) * matrix (i + j * n)
+      end do
+      
+      rhs(j) = rhs (j) - rhs (i) * matrix (i + j * n)
+    end do
+  end do
+  
+  sum = 0
+  do i = n, 1, -1
+    do j = n, i + 1, -1
+      sum = sum + matrix (j + i * n) * x(j)
+    end do
+    x(i) = rhs (i) - sum
+    sum = 0
+  end do
+end subroutine gauss_solver
+end
