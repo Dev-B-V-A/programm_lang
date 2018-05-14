@@ -1,8 +1,7 @@
+main := [
 size := (stdin nextLine) asNumber.
 
-(size < 1) ifTrue: [ 'Size matrix < 1, is invalid size!' displayNl. ]
-
-matrix := Array new: size.
+matrix := Array new : size * size.
 x := Array new: size.
 rhs := Array new: size.
 
@@ -14,4 +13,58 @@ print_matrix := [
     displayNl.
   ]
 ]
-  
+
+print_vector := [
+ 1 to: size do: [ :i |
+   x at: (i) display.
+ ]
+ displayNl.
+]
+
+init_matrix := [
+  1 to: size do: [ :i |
+    1 to: size do: [ :j |
+      matrix at: (i * size + j) put: 1 + ((i - j) abs).
+    ]
+  ]
+  sum := 0.
+  1 to: size do: [ :i |
+    1 to: size do: [ :j |
+      sum := sum + matrix at: (i * size + j).
+    ]
+    rhs at: (i) put: sum.
+  ]
+]
+
+gauss_solver := [ :sum :diag |
+  1 to: size do: [ i: |
+    diag := matrix (i * size + i).
+    rhs at: i put: (rhs at: i / diag).
+    1 to: size do: [ :k |
+      matrix at: (i * size + k) put: (matrix at: (i * size + k) / diag).
+    ]
+    
+    (i + 1) to: size do: [ :j |
+      (i + 1) to: size do: [ :k |
+        matrix at: (j * size + k) put: (matrix at: (j * size + k) - (matrix at: (i * size + k) * matrix at: (j * size + i)).
+       ]
+       rhs at: j put: (rhs at: j - (rhs at: i * matrix (j * size + i))).
+    ]
+  ]
+  sum := 0.
+    size to: 1 do: [ i:
+      size to: (i + 1) do: [ j:
+        sum := sum + (matrix at: (j + i * size) * x at: j).
+      ]
+      x at: i put: (rhs at: i - sum).
+      sum := 0.
+  ]
+]
+
+init_matrix value.
+gauss_solver value.
+print_vector value.
+
+]
+
+main value.
