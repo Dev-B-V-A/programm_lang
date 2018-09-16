@@ -1,0 +1,9 @@
+(define size (read))
+(define matrix (make-vector (* size size)))
+(define x (make-vector size))
+(define rhs (make-vector size))
+
+
+(define print (lambda (array size) (
+                           (do (i 1 (+ i 1)) (= i size) ()	
+                           	display (vector-ref array i))))
